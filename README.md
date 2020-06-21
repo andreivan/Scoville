@@ -6,6 +6,17 @@ Software Engineering Assignment from Scoville
   - Matplotlib
    
 # How to install
+Make sure Python is installed
+```sh
+python ––version
+```
+
+If not install any version of Python 3 and up
+```sh
+sudo apt install python3.6
+```
+
+Install matplotlib
 ```sh
 $ pip install matplotlib
 ```
@@ -15,6 +26,9 @@ $ pip install matplotlib
 ```sh
 $ python3 process.py
 ```
+To visualize each sweep of the LIDAR in different window change the flag to True
+<pre><code>VISUALIZE_SWEEP = False #Visualize each sweep in a different window
+</code></pre>
 
 # Discussion
 - The data is parsed into a 2D list separated by each sweep so data from each sweep can be accessed easily.
