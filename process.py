@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import random
 import csv
 
+from a_star import AStarPlanner
+
 from mpl_toolkits.mplot3d import Axes3D
 
 #Variables
@@ -33,8 +35,8 @@ def parse_flight_path(path):
                 pos_x.append([])
                 pos_y.append([])
             else:
-                pos_y[sweep].append(float(row[0]))
-                pos_x[sweep].append(float(row[1]))
+                pos_y[sweep].append(float(row[0])*10)
+                pos_x[sweep].append(float(row[1])*10)
                 length-=1
     return sweep
 
@@ -64,7 +66,7 @@ def prase_LIDAR(path):
             else:
                 #Compute the x and y of the point detected by LIDAR data
                 #sin theta = x/z | cos theta = y/z
-                z_/=1000 # to meter
+                z_/=100 # to decimeter
                 theta[sweep].append(float(theta_))
                 z[sweep].append(float(z_))
                 #The final position is x + position of the dron in current sweep            
@@ -138,19 +140,26 @@ def visualize_trajectory(sweep):
         
     for i in range(sweep):
         colors=(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
-        ax.scatter(lidar_x[i][:], lidar_y[i][:], s=5, c='b', marker='o') #LIDAR
+        plt.plot(lidar_x[i][:], lidar_y[i][:], 'bo') #LIDAR
         ax.scatter(-pos_x[i][0], pos_y[i][0], s=100, c=np.array([colors]), marker='P') #DRONE
         ax.text(-pos_x[i][0], pos_y[i][0], s=i, fontsize=12) #SWEEP
         if(i<sweep-1):
             plt.plot([-pos_x[i][0], -pos_x[i+1][0]], [pos_y[i][0], pos_y[i+1][0]], 'rx-')
 
+def find_min_max(x, y):
+    max_x = np.amax(np.amax(x))
+    min_x = np.amin(np.amin(x))
+    max_y = np.amax(np.amax(y))
+    min_y = np.amin(np.amin(y))
+
+    return min_x, max_x, min_y, max_y
     
-def visualize_grid(sweep):
+def flight_reroute(start, goal, sweep):
     # <summary>
-    # Visualize the LIDAR data as a grid to do path planning or reroute
+    # Reroute the trajectory based on start and goal (currently assumed as the first and the sweep parameter trajectory)
     # </summary>
     # <param> 
-    # The number of sweep to visualize
+    # The goal of flight reroute
     # </param>
     x_ = lidar_x.copy()
     y_ = lidar_y.copy()
@@ -158,46 +167,124 @@ def visualize_grid(sweep):
     pos_x_ = pos_x.copy()
     pos_y_ = pos_y.copy()
 
-    max_x = np.amax(np.amax(x_))
-    min_x = np.amin(np.amin(x_))
+    min_x, max_x, min_y, max_y = find_min_max(x_, y_)
     
-    max_y = np.amax(np.amax(y_))
-    min_y = np.amin(np.amin(y_))
-    
-    width = int(np.round(np.abs(max_x) + np.abs(min_x)))
+    width = int(np.round(np.abs(max_x) + np.abs(min_x))) 
     height = int(np.round(np.abs(max_y) + np.abs(min_y))) 
 
-    #[meter]
-    sx = -pos_x_[0][0] 
-    sy = pos_y_[0][0]
-    gx = -pos_x_[sweep-1][0]  
-    gy = pos_y_[sweep-1][0]  
-    grid_size = 2.0  
+    #[decimeter]
+    sx = int(-pos_x_[start][0]) 
+    sy = int(pos_y_[start][0]) 
+    gx = int(-pos_x_[goal-1][0]) 
+    gy = int(pos_y_[goal-1][0]) 
+    grid_size = 8.0 
     robot_radius = 1.0  
 
     # set obstacle positions
     ox, oy = [], []
     for s in range (sweep):
         for x, y in zip(x_[s], y_[s]):
-            ox.append(x)
-            oy.append(y)
+            ox.append(int(np.round(x)))
+            oy.append(int(np.round(y)))
 
-    fig = plt.figure('planning')
-
+    fig = plt.figure('reroute')
     ax = fig.add_subplot(111)
-
     plt.plot(ox, oy, ".k")
     plt.plot(sx, sy, "og")
     plt.plot(gx, gy, "xb")
+    major_ticks = np.arange(-200, 301, 20)
+    ax.set_xticks(major_ticks)
+    ax.set_yticks(major_ticks)
     plt.grid(True)
     plt.axis("equal")
 
+    a_star = AStarPlanner(ox, oy, grid_size, robot_radius, True)
+    rx, ry = a_star.planning(sx, sy, gx, gy)
+    plt.plot(rx, ry, "-r")
+    
+def flight_optimization(start, goal, sweep):
+    # <summary>
+    # Optimize the trajectory based on start and goal set
+    # To optimize the trajectory we use the middle trajectory as reference and perform rerouting twice
+    # </summary>
+    # <param> 
+    # The goal of flight reroute
+    # </param>
+    x_ = lidar_x.copy()
+    y_ = lidar_y.copy()
+
+    pos_x_ = pos_x.copy()
+    pos_y_ = pos_y.copy()
+
+    min_x, max_x, min_y, max_y = find_min_max(x_, y_)
+    
+    width = int(np.round(np.abs(max_x) + np.abs(min_x))) 
+    height = int(np.round(np.abs(max_y) + np.abs(min_y))) 
+
+    #[decimeter]
+    grid_size = 9.0 
+    robot_radius = 1.0  
+
+    # set obstacle positions
+    ox, oy = [], []
+    for s in range (sweep):
+        for x, y in zip(x_[s], y_[s]):
+            ox.append(int(np.round(x)) )
+            oy.append(int(np.round(y)) )
+
+    fig = plt.figure('optimize')
+    ax = fig.add_subplot(111)
+    plt.plot(ox, oy, ".k")
+    major_ticks = np.arange(-200, 301, 20)
+    ax.set_xticks(major_ticks)
+    ax.set_yticks(major_ticks)
+    plt.grid(True)
+    plt.axis("equal")
+
+    #optimization
+    gx = []
+    gy = [] 
+
+    for i in range (start, goal, 3):
+        print(i)
+        gx.append(int(-pos_x_[i][0])) 
+        gy.append(int(pos_y_[i][0])) 
+    if(goal%3!=0):
+        gx.append(int(-pos_x_[goal-1][0]))
+        gy.append(int(pos_y_[goal-1][0])) 
+    
+    a_star = AStarPlanner(ox, oy, grid_size, robot_radius, True)
+    rx = []
+    ry = []
+    for i in range(len(gx) - 1):
+        rx_, ry_ = a_star.planning(gx[i], gy[i], gx[i+1], gy[i+1])
+        rx.append(rx_)
+        ry.append(ry_)
+        plt.plot(gx[i], gy[i], "xg")
+        plt.plot(rx[i], ry[i], "-r")
+    
+    #plot original trajectory
+    fig = plt.figure('original')
+    ax = fig.add_subplot(111)
+    plt.plot(ox, oy, ".k")
+    major_ticks = np.arange(-200, 301, 20)
+    ax.set_xticks(major_ticks)
+    ax.set_yticks(major_ticks)
+    plt.grid(True)
+    plt.axis("equal")
+
+    for i in range(sweep):
+        plt.plot(-pos_x_[i][0], pos_y_[i][0], 'xg')
+        plt.plot([-pos_x_[i][0], -pos_x_[i+1][0]], [pos_y_[i][0], pos_y_[i+1][0]], '-r')
+
+    
 
 
 if __name__ == "__main__":
     #TODO get this from the user input not static initialization
-    VISUALIZE_3D = True
-    VISUALIZE_SWEEP = False #TODO Too many window replace with interactive UI
+    VISUALIZE_3D = False
+    #TODO Too many window replace with interactive UI
+    VISUALIZE_SWEEP = True #Visualize each sweep in a different window
     flight_path_dir = 'data/FlightPath.csv'
     LIDAR_dir = 'data/LIDARPoints.csv'
 
@@ -213,6 +300,6 @@ if __name__ == "__main__":
         visualize_data_2D(VISUALIZE_SWEEP, LIDAR_sweep)
 
     visualize_trajectory(LIDAR_sweep)
-
-    visualize_grid(LIDAR_sweep)
+    flight_reroute(0, LIDAR_sweep, LIDAR_sweep)
+    flight_optimization(0, LIDAR_sweep, LIDAR_sweep)
     plt.show()
