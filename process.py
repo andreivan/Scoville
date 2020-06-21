@@ -92,14 +92,14 @@ def visualize_data_2D(VISUALIZE_SWEEP, sweep):
     ax_c.set_ylabel('Y axis')
         
     for i in range(sweep):
+        colors=(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
         if(VISUALIZE_SWEEP):
             fig = plt.figure(i)
             ax = fig.add_subplot(111)
             ax.set_xlabel('X axis')
             ax.set_ylabel('Y axis')
-        colors=(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
-        ax.scatter(lidar_x[i][:], lidar_y[i][:], s=5, c=np.array([colors]), marker='o') #LIDAR
-        ax.scatter(-pos_x[i][0], pos_y[i][0], s=100, c=np.array([colors]), marker='P') #DRONE
+            ax.scatter(lidar_x[i][:], lidar_y[i][:], s=5, c=np.array([colors]), marker='o') #LIDAR
+            ax.scatter(-pos_x[i][0], pos_y[i][0], s=100, c=np.array([colors]), marker='P') #DRONE
         ax_c.scatter(lidar_x[i][:], lidar_y[i][:], s=5, c=np.array([colors]), marker='o') #LIDAR
         ax_c.scatter(-pos_x[i][0], pos_y[i][0], s=100, c=np.array([colors]), marker='P') #DRONE
 
@@ -121,15 +121,15 @@ def visualize_data_3D(VISUALIZE_SWEEP, sweep):
     ax_c.set_ylabel('Y axis')
         
     for i in range(sweep):
+        colors=(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
         if(VISUALIZE_SWEEP):
             fig = plt.figure(i)
             ax = fig.add_subplot(111, projection='3d')
             ax.set_zlabel('Z axis')
             ax.set_xlabel('X axis')
             ax.set_ylabel('Y axis')
-        colors=(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
-        ax.scatter(lidar_x[i][:], lidar_y[i][:], s=5, c=np.array([colors]), marker='o') #LIDAR
-        ax.scatter(-pos_x[i][0], pos_y[i][0], s=100, c=np.array([colors]), marker='P') #DRONE
+            ax.scatter(lidar_x[i][:], lidar_y[i][:], s=5, c=np.array([colors]), marker='o') #LIDAR
+            ax.scatter(-pos_x[i][0], pos_y[i][0], s=100, c=np.array([colors]), marker='P') #DRONE
         ax_c.scatter(lidar_x[i][:], lidar_y[i][:], s=5, c=np.array([colors]), marker='o') #LIDAR
         ax_c.scatter(-pos_x[i][0], pos_y[i][0], s=100, c=np.array([colors]), marker='P') #DRONE
 
@@ -293,7 +293,7 @@ if __name__ == "__main__":
     #TODO get this from the user input not static initialization
     VISUALIZE_3D = False
     #TODO Too many window replace with interactive UI
-    VISUALIZE_SWEEP = True #Visualize each sweep in a different window
+    VISUALIZE_SWEEP = False #Visualize each sweep in a different window
     flight_path_dir = 'data/FlightPath.csv'
     LIDAR_dir = 'data/LIDARPoints.csv'
 
