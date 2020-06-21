@@ -35,8 +35,8 @@ def parse_flight_path(path):
                 pos_x.append([])
                 pos_y.append([])
             else:
-                pos_y[sweep].append(float(row[0])*10)
-                pos_x[sweep].append(float(row[1])*10)
+                pos_x[sweep].append(float(row[0])*10)
+                pos_y[sweep].append(float(row[1])*10)
                 length-=1
     return sweep
 
@@ -70,8 +70,8 @@ def prase_LIDAR(path):
                 theta[sweep].append(float(theta_))
                 z[sweep].append(float(z_))
                 #The final position is x + position of the dron in current sweep            
-                lidar_x[sweep].append(np.sin( float(theta_) * np.pi/180) * float(z_) - pos_x[sweep][0])
-                lidar_y[sweep].append(np.cos( float(theta_) * np.pi/180) * float(z_) + pos_y[sweep][0])                
+                lidar_x[sweep].append(np.cos( float(theta_) * np.pi/180) * float(z_) + pos_x[sweep][0])
+                lidar_y[sweep].append(np.sin( float(theta_) * np.pi/180) * float(z_) - pos_y[sweep][0])                
                 length-=1
     return sweep
 
@@ -101,7 +101,7 @@ def visualize_data_2D(VISUALIZE_SWEEP, sweep):
             ax.scatter(lidar_x[i][:], lidar_y[i][:], s=5, c=np.array([colors]), marker='o') #LIDAR
             ax.scatter(-pos_x[i][0], pos_y[i][0], s=100, c=np.array([colors]), marker='P') #DRONE
         ax_c.scatter(lidar_x[i][:], lidar_y[i][:], s=5, c=np.array([colors]), marker='o') #LIDAR
-        ax_c.scatter(-pos_x[i][0], pos_y[i][0], s=100, c=np.array([colors]), marker='P') #DRONE
+        ax_c.scatter(pos_x[i][0], -pos_y[i][0], s=100, c=np.array([colors]), marker='P') #DRONE
 
 def visualize_data_3D(VISUALIZE_SWEEP, sweep):
     # <summary>
@@ -150,10 +150,10 @@ def visualize_trajectory(sweep):
     for i in range(sweep):
         colors=(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
         plt.plot(lidar_x[i][:], lidar_y[i][:], 'bo') #LIDAR
-        ax.scatter(-pos_x[i][0], pos_y[i][0], s=100, c=np.array([colors]), marker='P') #DRONE
-        ax.text(-pos_x[i][0], pos_y[i][0], s=i, fontsize=12) #SWEEP
+        ax.scatter(pos_x[i][0], -pos_y[i][0], s=100, c=np.array([colors]), marker='P') #DRONE
+        ax.text(pos_x[i][0], -pos_y[i][0], s=i, fontsize=12) #SWEEP
         if(i<sweep-1):
-            plt.plot([-pos_x[i][0], -pos_x[i+1][0]], [pos_y[i][0], pos_y[i+1][0]], 'rx-')
+            plt.plot([pos_x[i][0], pos_x[i+1][0]], [-pos_y[i][0], -pos_y[i+1][0]], 'rx-')
 
 def find_min_max(x, y):
     max_x = np.amax(np.amax(x))
@@ -182,11 +182,11 @@ def flight_reroute(start, goal, sweep):
     height = int(np.round(np.abs(max_y) + np.abs(min_y))) 
 
     #[decimeter]
-    sx = int(-pos_x_[start][0]) 
-    sy = int(pos_y_[start][0]) 
-    gx = int(-pos_x_[goal-1][0]) 
-    gy = int(pos_y_[goal-1][0]) 
-    grid_size = 8.0 
+    sx = int(pos_x_[start][0]) 
+    sy = int(-pos_y_[start][0]) 
+    gx = int(pos_x_[goal-1][0]) 
+    gy = int(-pos_y_[goal-1][0]) 
+    grid_size = 5.0 
     robot_radius = 1.0  
 
     # set obstacle positions
@@ -255,12 +255,11 @@ def flight_optimization(start, goal, sweep):
     gy = [] 
 
     for i in range (start, goal, 3):
-        print(i)
-        gx.append(int(-pos_x_[i][0])) 
-        gy.append(int(pos_y_[i][0])) 
+        gx.append(int(pos_x_[i][0])) 
+        gy.append(int(-pos_y_[i][0])) 
     if(goal%3!=0):
-        gx.append(int(-pos_x_[goal-1][0]))
-        gy.append(int(pos_y_[goal-1][0])) 
+        gx.append(int(pos_x_[goal-1][0]))
+        gy.append(int(-pos_y_[goal-1][0])) 
     
     a_star = AStarPlanner(ox, oy, grid_size, robot_radius, True)
     rx = []
@@ -283,8 +282,8 @@ def flight_optimization(start, goal, sweep):
     plt.axis("equal")
 
     for i in range(sweep):
-        plt.plot(-pos_x_[i][0], pos_y_[i][0], 'xg')
-        plt.plot([-pos_x_[i][0], -pos_x_[i+1][0]], [pos_y_[i][0], pos_y_[i+1][0]], '-r')
+        plt.plot(pos_x_[i][0], -pos_y_[i][0], 'xg')
+        plt.plot([pos_x_[i][0], pos_x_[i+1][0]], [-pos_y_[i][0], -pos_y_[i+1][0]], '-r')
 
     
 

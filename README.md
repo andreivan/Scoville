@@ -44,11 +44,8 @@ To visualize each sweep of the LIDAR in different window change the flag to True
 -Data visualization
 ![Data visualization](https://github.com/andreivan/Scoville/blob/master/results/trajectory_and_lidar.png?raw=true)
 
--First sweep
-![Sweep #0](https://github.com/andreivan/Scoville/blob/master/results/sweep_0.png?raw=true)
-
--Last sweep
-![Sweep #16](https://github.com/andreivan/Scoville/blob/master/results/sweep_16.png?raw=true)
+-Combined map
+![Sweep #0](https://github.com/andreivan/Scoville/blob/master/results/combined.png?raw=true)
 
 -Path reroute
 ![Reroute](https://github.com/andreivan/Scoville/blob/master/results/reroute_traj.png?raw=true)
