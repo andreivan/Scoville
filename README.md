@@ -44,6 +44,7 @@ VISUALIZE_SWEEP = False #Visualize each sweep in a different window
 # Results
 ![Data visualization](https://github.com/andreivan/Scoville/blob/master/results/trajectory_and_lidar.png?raw=true)
 *Data visualization*
+
 Plus &#8594; Drone position with the number of sweep in order
 Blue dots &#8594; The combined LIDAR point cloud mapped into x and y
 Red line &#8594; The predicted path by drawing line between two drone position
