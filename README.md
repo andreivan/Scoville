@@ -50,14 +50,17 @@ Red line &#8594; The predicted path by drawing line between two drone position
 
 ![Sweep #0](https://github.com/andreivan/Scoville/blob/master/results/combined.png?raw=true)
 *Combined map*
+
 Plus &#8594; Drone position with the color representing point cloud belong to which sweep.
 
 ![Sweep #0](https://github.com/andreivan/Scoville/blob/master/results/sweep_4.png?raw=true)
 *Individual sweep #5*
+
 Plus &#8594; Drone position with the color representing point cloud belong to which sweep.
 
 ![Reroute](https://github.com/andreivan/Scoville/blob/master/results/reroute_traj.png?raw=true)
 *Path reroute*
+
 Blue cross &#8594; Starting position.
 Green circle &#8594; Goal position.
 Teal cross &#8594; The searched position by A* algorithm.
@@ -65,6 +68,7 @@ Red line &#8594; The predicted reroute path by A* algorithm.
 
 ![Flight optimization](https://github.com/andreivan/Scoville/blob/master/results/optimized_traj.png?raw=true)
 *Path optimization*
+
 Green cross &#8594; Trajectories to be optimized.
 Teal cross &#8594; The searched position by A* algorithm.
 Red line &#8594; The predicted optimized path by A* algorithm.
